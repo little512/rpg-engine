@@ -49,8 +49,6 @@ function character:move(mx, my, dt, collision)
 		local function _move(np, pfX, pfY)
 			self.moving = true
 
-			print(np)
-
 			self.absX = self.absX +
 				((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
 			self.absY = self.absY +
