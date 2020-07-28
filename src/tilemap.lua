@@ -5,29 +5,38 @@ local util = require("src.util")
 local tilemap = {}
 tilemap.__index = tilemap
 
-function tilemap.new(_tileset, y, x)
-	return setmetatable({
-		_x = x,
-		_y = y,
+function tilemap.new(_tileset, _x, _y, filltile)
+	local _tilemap = {
+		x = _x,
+		y = _y,
 		tileset = _tileset,
 		map = {}
-	}, tilemap)
+	}
+
+	for y = 1, _y do
+		_tilemap.map[y] = {}
+		for x = 1, _x do
+			_tilemap.map[y][x] = filltile
+		end
+	end
+
+	return setmetatable(_tilemap, tilemap)
 end
 
 function tilemap:setTile(tile, x, y) -- tile = reference to tile in self.tileset.tiles
 	-- NOTE: fixed strange bug where y - 1 gets the collision state wanted but x + 1 gets the tile wanted
-	self.map[util.getIndexFromXY(x + 1, y, self._y)] = tile
+	self.map[y + 1][x + 1] = tile
 end
 
 function tilemap:getTile(x, y)
-	return self.map[util.getIndexFromXY(x + 1, y, self._y)]
+	return self.map[y + 1][x + 1]
 end
 
 function tilemap:draw()
-	for i, tile in pairs(self.map) do 	-- NOTE: changed to pairs because ipairs wasn't necessary and caused problems with 
-										-- gaps being stopped at, hence the rest of the tileset wouldn't be rendered
-		local x, y = util.getXYFromIndex(i - 1, self._x, self._y)
-		graphics.draw(self.tileset.image, tile, x * self.tileset.scale, y * self.tileset.scale)
+	for y, row in ipairs(self.map) do
+		for x, tile in ipairs(row) do
+			graphics.draw(self.tileset.image, tile, (x - 1) * self.tileset.scale, (y - 1) * self.tileset.scale)
+		end
 	end
 end
 

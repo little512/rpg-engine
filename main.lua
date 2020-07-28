@@ -118,6 +118,11 @@ local function printDebugInfo()
 		whiteTextColor, ", ",
 		(character_1.running and greenTextColor or (character_1.moving and cyanTextColor or whiteTextColor)),
 		(character_1.running and "running" or (character_1.moving and "N/A" or "N/A"))}, 10, 85)
+	
+	graphics.print({whiteTextColor,
+		"ElapsedTime: ",
+		{1 - (character_1.elap), 1, 1 - (character_1.elap), 1},
+		tostring(character_1.elap):sub(0,5)}, 10, 100)
 
 	graphics.print({whiteTextColor,
 		"Version: ",
@@ -147,11 +152,7 @@ function love.load()
 	tileset_1:createTile("white", 1, 1, tileset_1.scale, tileset_1.scale)
 
 	-- create tilemap from tileset
-	tilemap_1 = tilemap.new(tileset_1, 20, 15)
-	-- fill with gradient tile
-	for i = 1, (20 * 15) do
-		tilemap_1.map[i] = tileset_1.tiles.gradient
-	end
+	tilemap_1 = tilemap.new(tileset_1, 20, 15, tileset_1.tiles.gradient)
 
 	collisionmap_1 = collisionmap.new(20, 15, true)
 
@@ -194,21 +195,15 @@ function love.load()
 	print("Finished loading in " .. loadTime .. " seconds.")
 end
 
-local function movement(dt, collision)
-	character_1:move(
-		(character_1.absX * tilemap_1.tileset.scale) +
-			characterImageX / (tilemap_1.tileset.scale / characterImageX),
-		(character_1.absY * tilemap_1.tileset.scale) +
-			characterImageY / (tilemap_1.tileset.scale / characterImageY),
-		dt,
-		collision)
-end
-
-function love.update(dt) -- TODO: make this function cleaner
-	if character_1.player.inputting and not character_1.moving then
-		movement(dt, collisionmap_1)
-	elseif character_1.moving then
-		movement(dt, collisionmap_1)
+function love.update(dt)
+	if (character_1.player.inputting and not character_1.moving) or character_1.moving then
+		character_1:move(
+			(character_1.absX * tilemap_1.tileset.scale) +
+				characterImageX / (tilemap_1.tileset.scale / characterImageX),
+			(character_1.absY * tilemap_1.tileset.scale) +
+				characterImageY / (tilemap_1.tileset.scale / characterImageY),
+			dt,
+			collisionmap_1)
 	end
 end
 

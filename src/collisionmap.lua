@@ -5,13 +5,22 @@ local util = require("src.util")
 local collisionmap = {}
 collisionmap.__index = collisionmap
 
-function collisionmap.new(x, y, _OOBIsNonPassable)
-	return setmetatable({
-		_x = x,
-		_y = y,
+function collisionmap.new(_x, _y, _OOBIsNonPassable)
+	local _collisionmap = {
+		x = _x,
+		y = _y,
 		OOBIsNonPassable = _OOBIsNonPassable;
 		map = {}
-	}, collisionmap)
+	}
+
+	for y = 1, _y do
+		_collisionmap.map[y] = {}
+		for x = 1, _x do
+			_collisionmap.map[y][x] = 0
+		end
+	end
+
+	return setmetatable(_collisionmap, collisionmap)
 end
 
 collisionmap.states = { -- enum-type
@@ -19,20 +28,19 @@ collisionmap.states = { -- enum-type
 	NONPASSABLE = 1;
 }
 
-function collisionmap:setCollisionState(state, x, y) 	-- NOTE: untested/undefined behavior when setting collision states
-														-- out of bounds, this is discouraged.
-	self.map[util.getIndexFromXY(x, y - 1, self._y)] = state
+function collisionmap:setCollisionState(state, x, y)
+	self.map[y + 1][x + 1] = state
 end
 
 function collisionmap:getCollisionState(x, y)
 	if self.OOBIsNonPassable then
-		if (x < self._x) and (x > -1) and (y < self._y) and (y > -1) then
-			return self.map[util.getIndexFromXY(x, y - 1, self._y)]
+		if (x < self.x) and (x > -1) and (y < self.y) and (y > -1) then
+			return self.map[y + 1][x + 1]
 		else
 			return collisionmap.states.NONPASSABLE
 		end
 	else
-		return self.map[util.getIndexFromXY(x, y - 1, self._y)]
+		return self.map[y + 1][x + 1]
 	end
 end
 
