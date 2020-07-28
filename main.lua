@@ -36,6 +36,7 @@ local window =      love.window
 -- constants
 local config = require("src.config")
 local whiteTextColor = {1, 1, 1, 1}
+local greenTextColor = {0, 1, (20 / 255), 1}
 local blueTextColor = {(100 / 255), (100 / 255), (230 / 255), 1}
 local cyanTextColor = {0, 1, 1, 1}
 local collectionMode = "count"
@@ -109,6 +110,17 @@ local function printDebugInfo()
 		whiteTextColor, ", ",
 		cyanTextColor,
 		character_1.absY}, 10, 70)
+
+	graphics.print({whiteTextColor,
+		"Version: ",
+		cyanTextColor,
+		config.version_major,
+		whiteTextColor, ".",
+		cyanTextColor,
+		config.version_minor,
+		whiteTextColor, ".",
+		cyanTextColor,
+		config.version_patch}, 10, windowHeight - 20)
 end
 
 function love.load()
