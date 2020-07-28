@@ -112,6 +112,14 @@ local function printDebugInfo()
 		character_1.absY}, 10, 70)
 
 	graphics.print({whiteTextColor,
+		"MoveState: ",
+		(character_1.moving and greenTextColor or whiteTextColor),
+		(character_1.moving and "moving" or "still"),
+		whiteTextColor, ", ",
+		(character_1.running and greenTextColor or (character_1.moving and cyanTextColor or whiteTextColor)),
+		(character_1.running and "running" or (character_1.moving and "N/A" or "N/A"))}, 10, 85)
+
+	graphics.print({whiteTextColor,
 		"Version: ",
 		cyanTextColor,
 		config.version_major,

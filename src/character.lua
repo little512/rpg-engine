@@ -15,8 +15,10 @@ function character.new(_player, _character)
 		player = _player;
 		character = _character; -- should be drawable, finer details later
 
-		moving = false;	-- is the character currently moving between tiles? (if yes wait until no longer moving to buffer another movement)
-		speed = 0.25;	-- how many seconds in deltaTime should it take for the character to reach the destination
+		moving = false;		-- is the character currently moving between tiles? (if yes wait until no longer moving to buffer another movement)
+		running = false; 	-- is the character running because a movement was started and the player was holding shift?
+		speed = 0.25;		-- how many seconds in deltaTime should it take for the character to reach the destination
+		runSpeed = 0.10;	-- how many seconds in deltaTime to subtract from speed when running
 
 		elap = 0; 	-- elapsed time
 
@@ -25,26 +27,25 @@ function character.new(_player, _character)
 
 		absX = 0;	-- coordinate positions
 		absY = 0;
-
-		posX = 0;	-- used for lerp calculation
-		posY = 0;
 	}, character)
 end
 
 function character:move(mx, my, dt, collision)
 	local function update()
-		self.elap = self.elap + ((1 / self.speed) * dt)
+		self.elap = self.elap + ((1 / (self.speed - (self.running and self.runSpeed or 0))) * dt)
 
-		self.posX = util.lerp(self.x, mx, self.elap)
-		self.posY = util.lerp(self.y, my, self.elap)
-
-		self.x = floor(self.posX)
-		self.y = floor(self.posY)
+		self.x = floor(util.lerp(self.x, mx, self.elap))
+		self.y = floor(util.lerp(self.y, my, self.elap))
 	end
 
 	if not self.moving then
 		local function _move(np, pfX, pfY)
-			self.moving = true
+			if not self.moving then
+				self.moving = true
+				if (not self.running) and (self.player.holdingShift) then
+					self.running = true
+				end
+			end
 
 			self.absX = self.absX +
 				((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
@@ -100,6 +101,7 @@ function character:move(mx, my, dt, collision)
 	else
 		if self.elap >= 1 then -- done moving
 			self.moving = false
+			self.running = false
 
 			self.x = mx
 			self.y = my

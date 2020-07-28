@@ -10,6 +10,7 @@ function player.new()
 
 		controlling = true;	-- is the player currently controlling the character?
 		inputting = false;  -- whether or not the player is pressing a key
+		holdingShift = false; -- whether or not the player is holding shift
 	}, player)
 end
 
@@ -26,31 +27,19 @@ function player:registerControls()
 		self.dirX = self.dirX - (b and 1 or -1)
 
 		checkInputs()
-
-		--print("X: " .. self.dirX)
 	end
 	
 	local function upDown(b)
 		self.dirY = self.dirY - (b and 1 or -1)
 
 		checkInputs()
+	end
 
-		--print("Y: " .. self.dirY)
+	local function setShift(b)
+		self.holdingShift = b
 	end
 	
 	local function registerControls()
-		--[[
-		input:addHookPressed("left", leftRight, false)
-		input:addHookPressed("right", leftRight, true)
-		input:addHookPressed("up", upDown, false)
-		input:addHookPressed("down", upDown, true)
-	
-		input:addHookReleased("left", leftRight, true)
-		input:addHookReleased("right", leftRight, false)
-		input:addHookReleased("up", upDown, true)
-		input:addHookReleased("down", upDown, false)
-		--]]
-
 		input:addHookPressed("a", leftRight, true)
 		input:addHookPressed("d", leftRight, false)
 		input:addHookPressed("w", upDown, true)
@@ -60,6 +49,9 @@ function player:registerControls()
 		input:addHookReleased("d", leftRight, true)
 		input:addHookReleased("w", upDown, false)
 		input:addHookReleased("s", upDown, true)
+
+		input:addHookPressed("lshift", setShift, true)
+		input:addHookReleased("lshift", setShift, false)
 	end
 
 	registerControls()
