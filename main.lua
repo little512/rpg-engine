@@ -20,7 +20,7 @@ local window =      love.window
 --[[ TODO: 
 		X add tile sheets and tile maps
 		X add playable character
-		- add collision map (impassable, passable, etc)
+		X add collision map (impassable, passable, etc)
 		- add rooms (stationary cam, follow cam, doors)
 		- add tile states (interactable)
 		- add sprites
