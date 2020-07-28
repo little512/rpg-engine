@@ -46,6 +46,9 @@ function character:move(mx, my, dt)
 	if not self.moving then
 		self.moving = true
 
+		self.absX = self.absX + self.player.dirX
+		self.absY = self.absY + self.player.dirY
+
 		update()
 	else
 		if self.elap >= 1 then -- done moving

@@ -77,14 +77,39 @@ local function printDebugInfo()
 	local fps = math.floor(1 / timer.getDelta())
 	local mem = math.floor(collectgarbage(collectionMode))
 
-	graphics.print({whiteTextColor, "Current FPS: ", {(fps <= 45 and 1 or 0), (fps >= 30 and 1 or 0), (20 / 255), 1}, fps}, 10, 10)
-	graphics.print({whiteTextColor, "Average FPS: ", {(fps <= 45 and 1 or 0), (fps >= 30 and 1 or 0), (20 / 255), 1}, timer.getFPS()}, 10, 25)
-	graphics.print({whiteTextColor, "Memory (kB): ", blueTextColor, mem}, 10, 40)
-	graphics.print({whiteTextColor, "Axis: ", cyanTextColor, player_1.dirX, whiteTextColor, ", ", cyanTextColor, player_1.dirY}, 10, 55)
-	graphics.print({whiteTextColor, "AbsPos: ", cyanTextColor, character_1.absX, whiteTextColor, ", ", cyanTextColor, character_1.absY}, 10, 70)
+	graphics.print({whiteTextColor,
+		"Current FPS: ",
+		{(fps <= 45 and 1 or 0), (fps >= 30 and 1 or 0), (20 / 255), 1},
+		fps}, 10, 10)
+
+	graphics.print({whiteTextColor,
+		"Average FPS: ",
+		{(fps <= 45 and 1 or 0), (fps >= 30 and 1 or 0), (20 / 255), 1},
+		timer.getFPS()}, 10, 25)
+
+	graphics.print({whiteTextColor,
+		"Memory (kB): ",
+		blueTextColor,
+		mem}, 10, 40)
+
+	graphics.print({whiteTextColor,
+		"Axis: ",
+		cyanTextColor,
+		player_1.dirX,
+		whiteTextColor, ", ",
+		cyanTextColor,
+		player_1.dirY}, 10, 55)
+
+	graphics.print({whiteTextColor,
+		"AbsPos: ",
+		cyanTextColor,
+		character_1.absX,
+		whiteTextColor, ", ",
+		cyanTextColor,
+		character_1.absY}, 10, 70)
 end
 
-local function movement(dt)
+local function movement(dt) -- TODO: add collision map support
 	character_1:move(
 		(character_1.absX * tilemap_1.tileset.scale) +
 			characterImageX / (tilemap_1.tileset.scale / characterImageX),
@@ -148,12 +173,8 @@ function love.load()
 	print("Finished loading in " .. loadTime .. " seconds.")
 end
 
-function love.update(dt)
+function love.update(dt) -- TODO: make this function cleaner, add collision map support
 	if character_1.player.inputting and not character_1.moving then
-		character_1.absX = character_1.absX + character_1.player.dirX
-		character_1.absY = character_1.absY + character_1.player.dirY
-
-		character_1.moving = true
 		movement(dt)
 	elseif character_1.moving then
 		movement(dt)
