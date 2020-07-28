@@ -50,6 +50,7 @@ local tileset = require("src.tileset")
 local tilemap = require("src.tilemap")
 local player = require("src.player")
 local character = require("src.character")
+local collisionmap = require("src.collisionmap")
 
 -- class singletons
 local input = require("src.input")
@@ -62,6 +63,7 @@ local finalTime
 
 local tileset_1
 local tilemap_1
+local collisionmap_1
 local canvas_1
 
 local player_1
@@ -109,13 +111,14 @@ local function printDebugInfo()
 		character_1.absY}, 10, 70)
 end
 
-local function movement(dt) -- TODO: add collision map support
+local function movement(dt, collision)
 	character_1:move(
 		(character_1.absX * tilemap_1.tileset.scale) +
 			characterImageX / (tilemap_1.tileset.scale / characterImageX),
 		(character_1.absY * tilemap_1.tileset.scale) +
 			characterImageY / (tilemap_1.tileset.scale / characterImageY),
-		dt)
+		dt,
+		collision)
 end
 
 local function debugInform()
@@ -137,6 +140,7 @@ function love.load()
 	tileset_1 = tileset.new("data/img/tileset_1.png", 32) -- each tile is 32 pixels wide in this tileset
 	-- create quads to use
 	tileset_1:createTile("gradient", 1, 0, tileset_1.scale, tileset_1.scale)
+	tileset_1:createTile("white", 1, 1, tileset_1.scale, tileset_1.scale)
 
 	-- create tilemap from tileset
 	tilemap_1 = tilemap.new(tileset_1, 20, 15)
@@ -144,6 +148,19 @@ function love.load()
 	for i = 1, (20 * 15) do
 		tilemap_1.map[i] = tileset_1.tiles.gradient
 	end
+
+	collisionmap_1 = collisionmap.new(20, 15, true)
+
+	collisionmap_1:setCollisionState(collisionmap.states.NONPASSABLE, 1, 2)
+	collisionmap_1:setCollisionState(collisionmap.states.NONPASSABLE, 2, 3)
+	collisionmap_1:setCollisionState(collisionmap.states.NONPASSABLE, 3, 2)
+
+	tilemap_1:setTile(tileset_1.tiles.white, 1, 2) -- set this tile to nil so this tile isn't drawn indicating a void (non passable)
+	tilemap_1:setTile(tileset_1.tiles.white, 2, 3)
+	tilemap_1:setTile(tileset_1.tiles.white, 3, 2)
+
+	-- TODO: create a function in tilemap which automates the process of creating a
+	-- canvas and drawing to it (probably tilemap:getCanvas())
 
 	canvas_1 = graphics.newCanvas(20 * 32, 15 * 32) -- create canvas for our tiles
 
@@ -173,11 +190,11 @@ function love.load()
 	print("Finished loading in " .. loadTime .. " seconds.")
 end
 
-function love.update(dt) -- TODO: make this function cleaner, add collision map support
+function love.update(dt) -- TODO: make this function cleaner
 	if character_1.player.inputting and not character_1.moving then
-		movement(dt)
+		movement(dt, collisionmap_1)
 	elseif character_1.moving then
-		movement(dt)
+		movement(dt, collisionmap_1)
 	end
 end
 
@@ -195,10 +212,8 @@ function love.draw()
 				characterImageX / (tilemap_1.tileset.scale / characterImageX), 
 			-character_1.y + (windowHeight / 2) -
 				characterImageY / (tilemap_1.tileset.scale / characterImageY))
-		-- graphics.scale(1)
-		graphics.draw(canvas_1) -- draw the canvas first
+		graphics.draw(canvas_1)
 
-		-- draw the character in this graphics state, same translation and scale
 		-- TODO: have two states for rooms; one follows the character, one stays stationary
 		graphics.draw(character_1.character, character_1.x, character_1.y)
 
