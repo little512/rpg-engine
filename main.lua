@@ -35,7 +35,6 @@ local window =      love.window
 
 -- constants
 local config = require("src.config")
-local speed = 100
 local whiteTextColor = {1, 1, 1, 1}
 local blueTextColor = {(100 / 255), (100 / 255), (230 / 255), 1}
 local cyanTextColor = {0, 1, 1, 1}
@@ -54,6 +53,7 @@ local collisionmap = require("src.collisionmap")
 
 -- class singletons
 local input = require("src.input")
+local util = require("src.util")
 
 -- variables to load
 local loadTime
@@ -111,22 +111,6 @@ local function printDebugInfo()
 		character_1.absY}, 10, 70)
 end
 
-local function movement(dt, collision)
-	character_1:move(
-		(character_1.absX * tilemap_1.tileset.scale) +
-			characterImageX / (tilemap_1.tileset.scale / characterImageX),
-		(character_1.absY * tilemap_1.tileset.scale) +
-			characterImageY / (tilemap_1.tileset.scale / characterImageY),
-		dt,
-		collision)
-end
-
-local function debugInform()
-	print("debug mode activated")
-	print([[enter "cont" to exit this prompt]])
-	debug.debug()
-end
-
 function love.load()
 	startTime = timer.getTime()
 
@@ -134,7 +118,7 @@ function love.load()
 
 	input:addHookReleased("escape", event.quit)
 	input:addHookReleased("f1", toggleDebugInfo)
-	input:addHookReleased("f9", debugInform)
+	input:addHookReleased("f9", util.debugInform)
 
 	-- create tileset from image
 	tileset_1 = tileset.new("data/img/tileset_1.png", 32) -- each tile is 32 pixels wide in this tileset
@@ -188,6 +172,16 @@ function love.load()
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
 	print("Finished loading in " .. loadTime .. " seconds.")
+end
+
+local function movement(dt, collision)
+	character_1:move(
+		(character_1.absX * tilemap_1.tileset.scale) +
+			characterImageX / (tilemap_1.tileset.scale / characterImageX),
+		(character_1.absY * tilemap_1.tileset.scale) +
+			characterImageY / (tilemap_1.tileset.scale / characterImageY),
+		dt,
+		collision)
 end
 
 function love.update(dt) -- TODO: make this function cleaner

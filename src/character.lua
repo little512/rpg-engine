@@ -5,13 +5,10 @@ local timer = love.timer
 local floor = math.floor
 
 local collisionmap = require("src.collisionmap")
+local util = require("src.util")
 
 local character = {}
 character.__index = character
-
-local function lerp(p0, p1, dt)
-	return (1 - dt) * p0 + dt * p1
-end
 
 function character.new(_player, _character)
 	return setmetatable({
@@ -38,8 +35,8 @@ function character:move(mx, my, dt, collision)
 	local function update()
 		self.elap = self.elap + ((1 / self.speed) * dt)
 
-		self.posX = lerp(self.x, mx, self.elap)
-		self.posY = lerp(self.y, my, self.elap)
+		self.posX = util.lerp(self.x, mx, self.elap)
+		self.posY = util.lerp(self.y, my, self.elap)
 
 		self.x = floor(self.posX)
 		self.y = floor(self.posY)
