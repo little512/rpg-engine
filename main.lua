@@ -120,9 +120,15 @@ local function printDebugInfo()
 		(character_1.running and "running" or (character_1.moving and "N/A" or "N/A"))}, 10, 85)
 	
 	graphics.print({whiteTextColor,
-		"ElapsedTime: ",
+		"LerpInfo: ",
 		{1 - (character_1.elap), 1, 1 - (character_1.elap), 1},
-		tostring(character_1.elap):sub(0,5)}, 10, 100)
+		tostring(character_1.elap):sub(0,5),
+		whiteTextColor, ", ",
+		cyanTextColor,
+		character_1.x,
+		whiteTextColor, ", ",
+		cyanTextColor,
+		character_1.y}, 10, 100)
 
 	graphics.print({whiteTextColor,
 		"Version: ",

@@ -25,6 +25,9 @@ function character.new(_player, _character)
 		x = 0; 	-- pixel positions
 		y = 0;
 
+		_startX = 0;	-- internal variables for lerping
+		_startY = 0;
+
 		absX = 0;	-- coordinate positions
 		absY = 0;
 	}, character)
@@ -34,26 +37,28 @@ function character:move(mx, my, dt, collision)
 	local function update()
 		self.elap = self.elap + ((1 / (self.speed - (self.running and self.runSpeed or 0))) * dt)
 
-		self.x = floor(util.lerp(self.x, mx, self.elap))
-		self.y = floor(util.lerp(self.y, my, self.elap))
+		self.x = floor(util.lerp(self._startX, mx, self.elap))
+		self.y = floor(util.lerp(self._startY, my, self.elap))
 	end
 
-	if not self.moving then
-		local function _move(np, pfX, pfY)
-			if not self.moving then
-				self.moving = true
-				if (not self.running) and (self.player.holdingShift) then
-					self.running = true
-				end
-			end
-
-			self.absX = self.absX +
-				((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
-			self.absY = self.absY +
-				((not np) and (pfY and self.player.dirY or 0) or self.player.dirY)
-
-			update()
+	local function _move(np, pfX, pfY)
+		if not self.moving then
+			self.moving = true
 		end
+
+		self.running = (self.player.holdingShift)
+
+		self.absX = self.absX +
+			((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
+		self.absY = self.absY +
+			((not np) and (pfY and self.player.dirY or 0) or self.player.dirY)
+
+		update()
+	end
+
+	local function _collision()
+		self._startX = self.x
+		self._startY = self.y
 
 		if collision then
 			local nextIntendedPositionX, nextIntendedPositionY =
@@ -98,18 +103,24 @@ function character:move(mx, my, dt, collision)
 		else
 			_move(true, true, true)
 		end
-	else
-		if self.elap >= 1 then -- done moving
-			self.moving = false
-			self.running = false
+	end
 
+	if not self.moving then
+		_collision()
+	elseif self.elap >= 1 then -- TODO: if you're still inputting, skip this frame
+		self.elap = 0
+
+		if not self.player.inputting then
 			self.x = mx
 			self.y = my
 
-			self.elap = 0
+			self.moving = false
+			self.running = false
 		else
-			update()
+			_collision()
 		end
+	else
+		update()
 	end
 end
 
