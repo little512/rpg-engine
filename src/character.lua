@@ -107,7 +107,7 @@ function character:move(mx, my, dt, collision)
 
 	if not self.moving then
 		_collision()
-	elseif self.elap >= 1 then -- TODO: if you're still inputting, skip this frame
+	elseif self.elap >= 1 then
 		self.elap = 0
 
 		if not self.player.inputting then
