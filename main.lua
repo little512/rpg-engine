@@ -139,6 +139,17 @@ local function printDebugInfo()
 		" seconds"}, 10, 115)
 
 	graphics.print({whiteTextColor,
+		"DiagonalInfo: ",
+		cyanTextColor,
+		tostring(character_1.player.diagonal),
+		whiteTextColor, ", ",
+		cyanTextColor,
+		tostring(character_1.player.direction),
+		whiteTextColor, ", ",
+		cyanTextColor,
+		character_1.player.ambiguity}, 10, 130)
+
+	graphics.print({whiteTextColor,
 		"Version: ",
 		cyanTextColor,
 		config.version_major,

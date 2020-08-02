@@ -6,6 +6,7 @@ local collisionmap = require("src.collisionmap")
 local util = require("src.util")
 
 local min, max = math.min, math.max
+local abs = math.abs
 
 local rulesPassed = false
 local shouldCheckCollision = true
@@ -69,11 +70,28 @@ function character:move(mx, my, dt)
 			end
 	
 			self.running = self.player.holdingShift
-	
-			self.absX = self.absX +
-				((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
-			self.absY = self.absY +
-				((not np) and (pfY and self.player.dirY or 0) or self.player.dirY)
+
+			if not self.player.diagonal then
+				self.absX = self.absX +
+					((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
+				self.absY = self.absY +
+					((not np) and (pfY and self.player.dirY or 0) or self.player.dirY)
+			else
+				local correctedDirX, correctedDirY = self.player.dirX, self.player.dirY
+
+				if self.player.direction ~= nil then
+					if self.player.direction then -- up/down
+						correctedDirX = 0
+					else -- left/right
+						correctedDirY = 0
+					end
+				end
+
+				self.absX = self.absX +
+					((not np) and (pfX and correctedDirX or 0) or correctedDirX)
+				self.absY = self.absY +
+					((not np) and (pfY and correctedDirY or 0) or correctedDirY)
+			end
 	
 			update()
 		end
@@ -89,15 +107,21 @@ function character:move(mx, my, dt)
 		rulesPassed = false
 
 		local function _collision()
+			--print("calculating collision")
 			self._startX = self.x
 			self._startY = self.y
 
 			local collision = self.currentRoom.maps.collision
 	
 			if collision then
+				local nextIntendedDirectionX, nextIntendedDirectionY = ((self.player.diagonal == true) and
+						(self.player.direction == true) and 0 or self.player.dirX),
+					((self.player.diagonal == true) and
+						(self.player.direction == false) and 0 or self.player.dirY)
+
 				local nextIntendedPositionX, nextIntendedPositionY =
-					self.absX + self.player.dirX,
-					self.absY + self.player.dirY
+					self.absX + nextIntendedDirectionX,
+					self.absY + nextIntendedDirectionY
 	
 				local collisionStateX = collision:getCollisionState(nextIntendedPositionX, self.absY)
 				local collisionStateY = collision:getCollisionState(self.absX, nextIntendedPositionY)
@@ -105,21 +129,20 @@ function character:move(mx, my, dt)
 				local passableForX = 
 					collisionStateX == collisionmap.states.PASSABLE or
 					collisionStateX == nil -- treat nil as passable
-				local passableForY = 
+				local passableForY =
 					collisionStateY == collisionmap.states.PASSABLE or
 					collisionStateY == nil
 	
-				local nextIntendedState = collision:getCollisionState(nextIntendedPositionX, 
+				local nextIntendedState = collision:getCollisionState(nextIntendedPositionX,
 					nextIntendedPositionY)
 	
-				local normallyPassable = nextIntendedState == collisionmap.states.PASSABLE or 
+				local normallyPassable = nextIntendedState == collisionmap.states.PASSABLE or
 					nextIntendedState == nil
-	
-				local cardinal = (
-					(self.player.dirX ~= 0 and 
-					self.player.dirY == 0) or 
-					(self.player.dirX == 0 and 
-					self.player.dirY ~= 0))
+
+				local cardinal = ((nextIntendedDirectionX ~= 0 and
+					nextIntendedDirectionY == 0) or
+					(nextIntendedDirectionX == 0 and
+					nextIntendedDirectionY ~= 0))
 	
 				rulesPassed = -- TODO: make these optional
 					-- possibly passable
@@ -132,8 +155,10 @@ function character:move(mx, my, dt)
 					( not (normallyPassable and (not passableForX and not passableForY)) )
 
 				if rulesPassed then
+					--print("rules passed")
 					_move(normallyPassable, passableForX, passableForY)
 				else
+					--print("rules didn't pass")
 					_reset()
 				end
 			else
