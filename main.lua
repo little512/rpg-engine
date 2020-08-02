@@ -132,6 +132,13 @@ local function printDebugInfo()
 		character_1.y}, 10, 100)
 
 	graphics.print({whiteTextColor,
+		"LoadTime: ",
+		greenTextColor,
+		tostring(loadTime):sub(0,5),
+		whiteTextColor,
+		" seconds"}, 10, 115)
+
+	graphics.print({whiteTextColor,
 		"Version: ",
 		cyanTextColor,
 		config.version_major,
@@ -203,6 +210,9 @@ function _debug_switchRooms()
 		character_1:setRoom(_room)
 
 		_debug_switchedRooms = true
+	else
+		character_1:setRoom(room_1)
+		_debug_switchedRooms = false
 	end
 end
 

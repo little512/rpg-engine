@@ -2,10 +2,10 @@
 
 local timer = love.timer
 
-local floor = math.floor
-
 local collisionmap = require("src.collisionmap")
 local util = require("src.util")
+
+local min, max = math.min, math.max
 
 local rulesPassed = false
 local shouldCheckCollision = true
@@ -55,8 +55,12 @@ function character:move(mx, my, dt)
 		local function update()
 			self.elap = self.elap + ((1 / (self.speed - (self.running and self.runSpeed or 0))) * dt)
 	
-			self.x = floor(util.lerp(self._startX, mx, self.elap))
-			self.y = floor(util.lerp(self._startY, my, self.elap))
+			self.x = util.clamp(
+				util.round(
+					util.lerp(self._startX, mx, self.elap)), min(self._startX, mx), max(self._startX, mx))
+			self.y = util.clamp(
+				util.round(
+					util.lerp(self._startY, my, self.elap)), min(self._startY, my), max(self._startY, my))
 		end
 	
 		local function _move(np, pfX, pfY)
@@ -160,6 +164,11 @@ function character:setRoom(_room)
 
 	self.absX, self.absY = _room.startX, _room.startY
 	self.x, self.y = util.absToPixels(self.absX, self.absY, self, self.currentRoom.maps.tile.tileset)
+
+	self.elap = 0
+
+	self.moving = false
+	self.running = false
 end
 
 return character
