@@ -26,7 +26,8 @@ eventmap.types = {
 
 eventmap.interactions = {
 	TOUCH = 0;
-	ACTION = 1; -- TODO: implement interaction controls
+	ACTION = 1;
+	ANY = 2;
 }
 
 function eventmap:registerEvent(name, _type, _interaction, _func, ...)

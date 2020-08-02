@@ -22,7 +22,7 @@ local window =      love.window
 		X add playable character
 		X add collision map (impassable, passable, etc)
 		X add rooms (stationary cam, follow cam, doors)
-		- add event tiles (button [standing], interactable [adjacent actionable])
+		X add event tiles (button [standing], interactable [adjacent actionable])
 		- add sprites
 
 	other:
@@ -208,7 +208,7 @@ function love.load()
 
 	eventmap_1:registerEvent("event_1",
 		eventmap.types.BUTTON,
-		eventmap.interactions.TOUCH,
+		eventmap.interactions.ACTION,
 		(function(character, s)
 			print(s)
 		end),

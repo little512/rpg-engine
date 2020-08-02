@@ -8,9 +8,6 @@ local eventmap = require("src.eventmap")
 
 local min, max = math.min, math.max
 
-local rulesPassed = false
-local shouldCheckCollision = true
-
 local character = {}
 character.__index = character
 
@@ -51,6 +48,8 @@ function character.new(_player, _character, _room) -- can construct character wi
 		_character.y = _y
 	end
 
+	_character.player.character = _character
+
 	return setmetatable(_character, character)
 end
 
@@ -60,6 +59,61 @@ local adjacentDirections = {
 	{-1, 0}, -- left
 	{1, 0} -- right
 }
+
+function character:eventDetection(interact)
+	local event = self.currentRoom.maps.event
+
+	if event then
+		local function _checkPos(x, y)
+			return event:getEvent(x, y)
+		end
+
+		local function _call(_e, _interact)
+			if _interact then
+				if _e.interaction == eventmap.interactions.ACTION then
+					_e.func(self, unpack(_e.args))
+				end
+			else
+				if _e.interaction == eventmap.interactions.TOUCH then
+					_e.func(self, unpack(_e.args))
+				end
+			end
+
+			if _e.interaction == eventmap.interactions.ANY then
+				_e.func(self, unpack(_e.args))
+			end
+		end
+
+		-- TODO: associate a sprite with an event (optional)
+
+		-- check the tile you're standing on first
+		local standing = _checkPos(self.absX, self.absY)
+
+		if not standing then -- check adjacent positions for type 1 (CROSS) events
+			for _, dir in ipairs(adjacentDirections) do
+				local _x, _y = self.absX + dir[1], self.absY + dir[2]
+				local rules = 
+					-- no going out of bounds in the negative direction
+					( not (util.sign(_x) == -1 or util.sign(_y) == -1) ) 	and
+					-- no going out of bounds in the positive direction
+					( not ((_x > event.x) or (_y > (event.y - 1))) )
+
+				if rules then
+					local adjacentEvent = _checkPos(_x, _y)
+
+					if adjacentEvent then
+						if adjacentEvent.type == eventmap.types.CROSS then
+							_call(adjacentEvent, interact)
+						end
+					end
+				end
+			end
+		else
+			_call(standing, interact)
+		end
+
+	end
+end
 
 function character:move(mx, my, dt)
 	if self.currentRoom then
@@ -122,46 +176,6 @@ function character:move(mx, my, dt)
 
 		rulesPassed = false
 
-		local function _eventDetection()
-			local event = self.currentRoom.maps.event
-
-			if event then 
-				local function _checkPos(x, y)
-					return event:getEvent(x, y)
-				end
-
-				local function _call(_e)
-					_e.func(self, unpack(_e.args))
-				end
-
-				-- check the tile you're standing on first
-				local standing = _checkPos(self.absX, self.absY)
-
-				if not standing then -- check adjacent positions for type 1 (CROSS) events
-					for _, dir in ipairs(adjacentDirections) do
-						local _x, _y = self.absX + dir[1], self.absY + dir[2]
-						local rules = 
-							-- no going out of bounds in the negative direction
-							( not (util.sign(_x) == -1 or util.sign(_y) == -1) ) 	and
-							-- no going out of bounds in the positive direction
-							( not ((_x > event.x) or (_y > (event.y - 1))) )
-
-						if rules then
-							local adjacentEvent = _checkPos(_x, _y)
-
-							if adjacentEvent then
-								if adjacentEvent.type == eventmap.types.CROSS then
-									_call(adjacentEvent)
-								end
-							end
-						end
-					end
-				else
-					_call(standing)
-				end
-			end
-		end
-
 		local function _collision()
 			--print("calculating collision")
 			self._startX = self.x
@@ -200,7 +214,7 @@ function character:move(mx, my, dt)
 					(nextIntendedDirectionX == 0 and
 					nextIntendedDirectionY ~= 0))
 	
-				rulesPassed = -- TODO: make these optional
+				local rulesPassed = -- TODO: make these optional
 					-- possibly passable
 					( normallyPassable or (passableForX or passableForY) ) 				and
 					-- no empty movement directly into walls
@@ -227,7 +241,7 @@ function character:move(mx, my, dt)
 		elseif self.elap >= 1 then
 			self.elap = 0
 
-			_eventDetection()
+			self:eventDetection(false)
 	
 			if not self.player.inputting then
 				_reset()
@@ -239,6 +253,12 @@ function character:move(mx, my, dt)
 		end
 	else
 		print("no room set for character!")
+	end
+end
+
+function character:handleInputs(b, p)
+	if b and p then -- pressing A
+		self:eventDetection(true)
 	end
 end
 

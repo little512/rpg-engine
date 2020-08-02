@@ -85,6 +85,8 @@ function player:registerControls()
 		else
 			self.BButton = p
 		end
+
+		self.character:handleInputs(b, p)
 	end
 	
 	local function registerControls()
