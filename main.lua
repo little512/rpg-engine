@@ -151,7 +151,6 @@ function love.load()
 	graphics.setDefaultFilter("nearest", "nearest", 1) -- turn off anti-aliasing, this is a pixelated game :)
 
 	input:addHookReleased("escape", event.quit)
-	input:addHookReleased("f1", toggleDebugInfo)
 	input:addHookReleased("f9", util.debugInform)
 
 	-- create tileset from image
@@ -184,10 +183,14 @@ function love.load()
 
 	player_1:registerControls()
 
+	input:addHookReleased("f1", toggleDebugInfo) -- wait for the info to be loaded
+
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
 	print("Finished loading in " .. loadTime .. " seconds.")
 end
+
+-- [[ testing for switching rooms: ]]
 
 local _debug_switchedRooms = false
 
@@ -204,6 +207,8 @@ function _debug_switchRooms()
 end
 
 input:addHookReleased("e", _debug_switchRooms)
+
+-- [[ testing for switching rooms ]]
 
 function love.update(dt)
 	if (character_1.player.inputting and not character_1.moving) or character_1.moving then
@@ -225,6 +230,7 @@ function love.draw()
 
 	graphics.push()
 
+		-- translate
 		if character_1.currentRoom.cameraMode then
 			graphics.translate(-character_1.x + (windowWidth / 2) -
 					characterImageX / (tilemap_1.tileset.scale / characterImageX), 
@@ -241,8 +247,12 @@ function love.draw()
 							character_1.currentRoom.stationaryY)
 		end
 
+		-- draw background image
+
+		-- draw tiles
 		graphics.draw(character_1.currentRoom.canvas)
 
+		-- draw character
 		graphics.draw(character_1.character, character_1.x, character_1.y)
 
 	graphics.pop()
