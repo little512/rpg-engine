@@ -51,6 +51,7 @@ local player 		= require("src.player")
 local character 	= require("src.character")
 local collisionmap 	= require("src.collisionmap")
 local room 			= require("src.room")
+local eventmap		= require("src.eventmap")
 
 -- class singletons
 local input = require("src.input")
@@ -67,6 +68,7 @@ local tilemap_1
 local collisionmap_1
 local canvas_1
 local room_1
+local eventmap_1
 
 local player_1
 local character_1
@@ -175,6 +177,7 @@ function love.load()
 	tileset_1 = tileset.new("data/img/tileset_1.png", 32) -- each tile is 32 pixels wide in this tileset
 	-- create quads to use
 	tileset_1:createTile("gradient", 1, 0, tileset_1.scale, tileset_1.scale)
+	tileset_1:createTile("black", 0, 0, tileset_1.scale, tileset_1.scale)
 	tileset_1:createTile("white", 1, 1, tileset_1.scale, tileset_1.scale)
 
 	-- create tilemap from tileset
@@ -190,7 +193,21 @@ function love.load()
 	tilemap_1:setTile(tileset_1.tiles.white, 2, 3)
 	tilemap_1:setTile(tileset_1.tiles.white, 3, 2)
 
-	room_1 = room.new(tilemap_1, collisionmap_1, nil, 0, 0, false)
+	tilemap_1:setTile(tileset_1.tiles.black, 2, 2)
+
+	eventmap_1 = eventmap.new(20, 15)
+
+	eventmap_1:registerEvent("event_1",
+		eventmap.types.BUTTON,
+		eventmap.interactions.TOUCH,
+		(function(character, s)
+			print(s)
+		end),
+		"Event triggered!")
+
+	eventmap_1:setEvent("event_1", 2, 2)
+
+	room_1 = room.new(tilemap_1, collisionmap_1, eventmap_1, 0, 0, false)
 
 	player_1 = player.new()
 

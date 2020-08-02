@@ -4,9 +4,9 @@ local timer = love.timer
 
 local collisionmap = require("src.collisionmap")
 local util = require("src.util")
+local eventmap = require("src.eventmap")
 
 local min, max = math.min, math.max
-local abs = math.abs
 
 local rulesPassed = false
 local shouldCheckCollision = true
@@ -28,6 +28,9 @@ function character.new(_player, _character, _room) -- can construct character wi
 
 		absX = 0;	-- coordinate positions
 		absY = 0;
+
+		facingUpDown = -1;
+		facingLeftRight; 0;
 
 		elap = 0; 	-- elapsed time
 
@@ -51,6 +54,13 @@ function character.new(_player, _character, _room) -- can construct character wi
 	return setmetatable(_character, character)
 end
 
+local adjacentDirections = {
+	{0, -1}, -- up
+	{0, 1}, -- down
+	{-1, 0}, -- left
+	{1, 0} -- right
+}
+
 function character:move(mx, my, dt)
 	if self.currentRoom then
 		local function update()
@@ -70,6 +80,9 @@ function character:move(mx, my, dt)
 			end
 	
 			self.running = self.player.holdingShift
+
+			local oldAbsX = self.absX
+			local oldAbsY = self.absY
 
 			if not self.player.diagonal then
 				self.absX = self.absX +
@@ -92,6 +105,9 @@ function character:move(mx, my, dt)
 				self.absY = self.absY +
 					((not np) and (pfY and correctedDirY or 0) or correctedDirY)
 			end
+
+			self.facingLeftRight = (self.absX - oldAbsX)
+			self.facingUpDown = (self.absY - oldAbsY)
 	
 			update()
 		end
@@ -105,6 +121,40 @@ function character:move(mx, my, dt)
 		end
 
 		rulesPassed = false
+
+		local function _eventDetection()
+			local event = self.currentRoom.maps.event
+
+			if event then 
+				local function _checkPos(x, y)
+					return event:getEvent(x, y)
+				end
+
+				local function _call(_e)
+					_e.func(self, unpack(_e.args))
+				end
+
+				-- check the tile you're standing on first
+				local standing = _checkPos(self.absX, self.absY)
+
+				if not standing then -- check adjacent positions for type 1 (CROSS) events
+					for _, dir in ipairs(adjacentDirections) do
+						local _x, _y = self.absX + dir[1], self.absY + dir[2]
+						if not(util.sign(_x) == -1 or util.sign(_y) == -1) then
+							local adjacentEvent = _checkPos(_x, _y)
+
+							if adjacentEvent then
+								if adjacentEvent.type == eventmap.types.CROSS then
+									_call(adjacentEvent)
+								end
+							end
+						end
+					end
+				else
+					_call(standing)
+				end
+			end
+		end
 
 		local function _collision()
 			--print("calculating collision")
@@ -170,6 +220,8 @@ function character:move(mx, my, dt)
 			_collision()
 		elseif self.elap >= 1 then
 			self.elap = 0
+
+			_eventDetection()
 	
 			if not self.player.inputting then
 				_reset()
