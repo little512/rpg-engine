@@ -8,11 +8,11 @@ This is going to be a JRPG-style engine, reminiscent of Pokemon or Final Fantasy
 
 ## Can I use it?
 
-Sure! See the [LICENSE](../blob/master/LICENSE) for more info :)
+Sure! See the [LICENSE](../master/LICENSE) for more info :)
 
 ## I don't want to copy it exactly, can I take bits of it?
 
-You can do that too! If you have any questions see the [LICENSE](../blob/master/LICENSE).
+You can do that too! If you have any questions see the [LICENSE](../master/LICENSE).
 
 ## Can I contribute to it?
 
