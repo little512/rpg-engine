@@ -2,7 +2,7 @@ local config = {
     title =     "Tile demo";
     version_major = 0;
     version_minor = 3;
-    version_patch = 0;
+    version_patch = 1;
     width =     800;
     height =    600;
 }
