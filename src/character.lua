@@ -140,7 +140,13 @@ function character:move(mx, my, dt)
 				if not standing then -- check adjacent positions for type 1 (CROSS) events
 					for _, dir in ipairs(adjacentDirections) do
 						local _x, _y = self.absX + dir[1], self.absY + dir[2]
-						if not(util.sign(_x) == -1 or util.sign(_y) == -1) then
+						local rules = 
+							-- no going out of bounds in the negative direction
+							( not (util.sign(_x) == -1 or util.sign(_y) == -1) ) 	and
+							-- no going out of bounds in the positive direction
+							( not ((_x > event.x) or (_y > (event.y - 1))) )
+
+						if rules then
 							local adjacentEvent = _checkPos(_x, _y)
 
 							if adjacentEvent then
