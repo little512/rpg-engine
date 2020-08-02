@@ -140,7 +140,9 @@ local function printDebugInfo()
 		config.version_minor,
 		whiteTextColor, ".",
 		cyanTextColor,
-		config.version_patch}, 10, windowHeight - 20)
+		config.version_patch .. " ",
+		greenTextColor, 
+		config.version_suffix}, 10, windowHeight - 20)
 end
 
 function love.load()

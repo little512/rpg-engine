@@ -3,6 +3,7 @@ local config = {
     version_major = 0;
     version_minor = 3;
     version_patch = 1;
+    version_suffix = "alpha";
     width =     800;
     height =    600;
 }
