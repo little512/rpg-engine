@@ -21,16 +21,15 @@ local window =      love.window
 		X add tile sheets and tile maps
 		X add playable character
 		X add collision map (impassable, passable, etc)
-		- add rooms (stationary cam, follow cam, doors)
-		- add tile states (interactable)
+		X add rooms (stationary cam, follow cam, doors)
+		- add event tiles (button [standing], interactable [adjacent actionable])
 		- add sprites
 
 	other:
 		- make level editor
 		- work on UI: dialog, inventory, party
 		- work on encounter mechanics
-		- sfx, music
-		- event triggers
+		- sfx, music support
 --]]
 
 -- constants
@@ -46,11 +45,12 @@ local showDebugInfo = false
 local windowWidth, windowHeight = config.width, config.height
 
 --classes
-local tileset = require("src.tileset")
-local tilemap = require("src.tilemap")
-local player = require("src.player")
-local character = require("src.character")
-local collisionmap = require("src.collisionmap")
+local tileset 		= require("src.tileset")
+local tilemap 		= require("src.tilemap")
+local player 		= require("src.player")
+local character 	= require("src.character")
+local collisionmap 	= require("src.collisionmap")
+local room 			= require("src.room")
 
 -- class singletons
 local input = require("src.input")
@@ -66,6 +66,7 @@ local tileset_1
 local tilemap_1
 local collisionmap_1
 local canvas_1
+local room_1
 
 local player_1
 local character_1
@@ -166,33 +167,18 @@ function love.load()
 	collisionmap_1:setCollisionState(collisionmap.states.NONPASSABLE, 2, 3)
 	collisionmap_1:setCollisionState(collisionmap.states.NONPASSABLE, 3, 2)
 
-	tilemap_1:setTile(tileset_1.tiles.white, 1, 2) -- set this tile to nil so this tile isn't drawn indicating a void (non passable)
+	tilemap_1:setTile(tileset_1.tiles.white, 1, 2)
 	tilemap_1:setTile(tileset_1.tiles.white, 2, 3)
 	tilemap_1:setTile(tileset_1.tiles.white, 3, 2)
 
-	-- TODO: create a function in tilemap which automates the process of creating a
-	-- canvas and drawing to it (probably tilemap:getCanvas())
-
-	canvas_1 = graphics.newCanvas(20 * 32, 15 * 32) -- create canvas for our tiles
-
-	graphics.setCanvas(canvas_1)
-
-		tilemap_1:draw() -- draw tiles to the canvas
-	
-	graphics.setCanvas()
+	room_1 = room.new(tilemap_1, collisionmap_1, nil, 0, 0, false)
 
 	player_1 = player.new()
 
 	characterImage = graphics.newImage("data/img/plr.png")
-	character_1 = character.new(player_1, characterImage)
+	character_1 = character.new(player_1, characterImage, room_1)
 
-	local _x, _y = character_1.character:getDimensions()
-
-	characterImageX = _x
-	characterImageY = _y
-
-	character_1.x = characterImageX / (tilemap_1.tileset.scale / characterImageX)
-	character_1.y = characterImageY / (tilemap_1.tileset.scale / characterImageY)
+	characterImageX, characterImageY = character_1.character:getDimensions()
 
 	player_1:registerControls()
 
@@ -201,15 +187,29 @@ function love.load()
 	print("Finished loading in " .. loadTime .. " seconds.")
 end
 
+local _debug_switchedRooms = false
+
+function _debug_switchRooms()
+	if not _debug_switchedRooms then
+		local _tile = tilemap.new(tileset_1, 5, 5, tileset_1.tiles.gradient)
+		local _collision = collisionmap.new(_tile.x, _tile.y, true)
+		local _room = room.new(_tile, _collision, nil, 0, 2, true)
+
+		character_1:setRoom(_room)
+
+		_debug_switchedRooms = true
+	end
+end
+
+input:addHookReleased("e", _debug_switchRooms)
+
 function love.update(dt)
 	if (character_1.player.inputting and not character_1.moving) or character_1.moving then
-		character_1:move(
-			(character_1.absX * tilemap_1.tileset.scale) +
-				characterImageX / (tilemap_1.tileset.scale / characterImageX),
-			(character_1.absY * tilemap_1.tileset.scale) +
-				characterImageY / (tilemap_1.tileset.scale / characterImageY),
-			dt,
-			collisionmap_1)
+		local _x, _y = util.absToPixels(character_1.absX,
+			character_1.absY,
+			character_1,
+			tilemap_1.tileset)
+		character_1:move(_x, _y, dt)
 	end
 end
 
@@ -223,13 +223,24 @@ function love.draw()
 
 	graphics.push()
 
-		graphics.translate(-character_1.x + (windowWidth / 2) -
-				characterImageX / (tilemap_1.tileset.scale / characterImageX), 
-			-character_1.y + (windowHeight / 2) -
-				characterImageY / (tilemap_1.tileset.scale / characterImageY))
-		graphics.draw(canvas_1)
+		if character_1.currentRoom.cameraMode then
+			graphics.translate(-character_1.x + (windowWidth / 2) -
+					characterImageX / (tilemap_1.tileset.scale / characterImageX), 
+				-character_1.y + (windowHeight / 2) -
+					characterImageY / (tilemap_1.tileset.scale / characterImageY))
+		else
+			graphics.translate((windowWidth / 2) -
+				((character_1.currentRoom.maps.tile.x *
+					character_1.currentRoom.maps.tile.tileset.scale) / 2) +
+						character_1.currentRoom.stationaryX,
+				(windowHeight / 2) -
+					((character_1.currentRoom.maps.tile.y *
+						character_1.currentRoom.maps.tile.tileset.scale) / 2) +
+							character_1.currentRoom.stationaryY)
+		end
 
-		-- TODO: have two states for rooms; one follows the character, one stays stationary
+		graphics.draw(character_1.currentRoom.canvas)
+
 		graphics.draw(character_1.character, character_1.x, character_1.y)
 
 	graphics.pop()
