@@ -7,6 +7,9 @@ local floor = math.floor
 local collisionmap = require("src.collisionmap")
 local util = require("src.util")
 
+local rulesPassed = false
+local shouldCheckCollision = true
+
 local character = {}
 character.__index = character
 
@@ -47,7 +50,7 @@ function character.new(_player, _character, _room) -- can construct character wi
 	return setmetatable(_character, character)
 end
 
-function character:move(mx, my, dt) -- TODO: fix empty movement into walls when skipping stationary frame while still inputting
+function character:move(mx, my, dt)
 	if self.currentRoom then
 		local function update()
 			self.elap = self.elap + ((1 / (self.speed - (self.running and self.runSpeed or 0))) * dt)
@@ -61,7 +64,7 @@ function character:move(mx, my, dt) -- TODO: fix empty movement into walls when 
 				self.moving = true
 			end
 	
-			self.running = (self.player.holdingShift)
+			self.running = self.player.holdingShift
 	
 			self.absX = self.absX +
 				((not np) and (pfX and self.player.dirX or 0) or self.player.dirX)
@@ -70,7 +73,17 @@ function character:move(mx, my, dt) -- TODO: fix empty movement into walls when 
 	
 			update()
 		end
-	
+
+		local function _reset()
+			self.x = mx
+			self.y = my
+
+			self.moving = false
+			self.running = false
+		end
+
+		rulesPassed = false
+
 		local function _collision()
 			self._startX = self.x
 			self._startY = self.y
@@ -104,7 +117,7 @@ function character:move(mx, my, dt) -- TODO: fix empty movement into walls when 
 					(self.player.dirX == 0 and 
 					self.player.dirY ~= 0))
 	
-				local rules = -- TODO: make these optional
+				rulesPassed = -- TODO: make these optional
 					-- possibly passable
 					( normallyPassable or (passableForX or passableForY) ) 				and
 					-- no empty movement directly into walls
@@ -113,9 +126,11 @@ function character:move(mx, my, dt) -- TODO: fix empty movement into walls when 
 					( not (not normallyPassable and (passableForX and passableForY)) ) 	and
 					-- no clipping through corners where the NIP is passable
 					( not (normallyPassable and (not passableForX and not passableForY)) )
-	
-				if rules then
+
+				if rulesPassed then
 					_move(normallyPassable, passableForX, passableForY)
+				else
+					_reset()
 				end
 			else
 				_move(true, true, true)
@@ -128,11 +143,7 @@ function character:move(mx, my, dt) -- TODO: fix empty movement into walls when 
 			self.elap = 0
 	
 			if not self.player.inputting then
-				self.x = mx
-				self.y = my
-	
-				self.moving = false
-				self.running = false
+				_reset()
 			else
 				_collision()
 			end
