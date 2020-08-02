@@ -35,6 +35,7 @@ local window =      love.window
 -- constants
 local config = require("src.config")
 local whiteTextColor = {1, 1, 1, 1}
+local redTextColor = {1, (20 / 255), (20 / 255), 1}
 local greenTextColor = {0, 1, (20 / 255), 1}
 local blueTextColor = {(100 / 255), (100 / 255), (230 / 255), 1}
 local cyanTextColor = {0, 1, 1, 1}
@@ -143,6 +144,14 @@ local function printDebugInfo()
 		whiteTextColor, ", ",
 		cyanTextColor,
 		character_1.player.ambiguity}, 10, 115)
+
+	graphics.print({whiteTextColor,
+		"ButtonState: ",
+		(player_1.AButton and greenTextColor or whiteTextColor),
+		"A",
+		whiteTextColor, ", ",
+		(player_1.BButton and redTextColor or whiteTextColor),
+		"B"}, 10, 130)
 
 	graphics.print({whiteTextColor,
 		"LoadTime: ",

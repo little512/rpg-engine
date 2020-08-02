@@ -10,6 +10,18 @@ function player.new()
 		dirX = 0; 	-- input direction
 		dirY = 0;
 
+		controls = {
+			up = "up";
+			down = "down";
+			left = "left";
+			right = "right";
+		
+			sprint = "lshift";
+		
+			a = "z";
+			b = "x";
+		};
+
 		ambiguity = 0; -- -1 for negative direction, 0 for no ambiguity, 1 for positive direction
 		diagonal = false; -- true when wa, as, sd, dw held
 		direction = nil; -- true for up/down, nil for no direction, false for left/right
@@ -17,6 +29,9 @@ function player.new()
 		controlling = true;	-- is the player currently controlling the character?
 		inputting = false;  -- whether or not the player is pressing a key
 		holdingShift = false; -- whether or not the player is holding shift
+
+		AButton = false;
+		BButton = false;
 	}, player)
 end
 
@@ -63,20 +78,34 @@ function player:registerControls()
 	local function setShift(b)
 		self.holdingShift = b
 	end
+
+	local function setButtons(b, p)
+		if b then
+			self.AButton = p
+		else
+			self.BButton = p
+		end
+	end
 	
 	local function registerControls()
-		input:addHookPressed("a", leftRight, true, true)
-		input:addHookPressed("d", leftRight, false, true)
-		input:addHookPressed("w", upDown, true, true)
-		input:addHookPressed("s", upDown, false, true)
+		input:addHookPressed(self.controls.left, leftRight, true, true)
+		input:addHookPressed(self.controls.right, leftRight, false, true)
+		input:addHookPressed(self.controls.up, upDown, true, true)
+		input:addHookPressed(self.controls.down, upDown, false, true)
 	
-		input:addHookReleased("a", leftRight, false, false)
-		input:addHookReleased("d", leftRight, true, false)
-		input:addHookReleased("w", upDown, false, false)
-		input:addHookReleased("s", upDown, true, false)
+		input:addHookReleased(self.controls.left, leftRight, false, false)
+		input:addHookReleased(self.controls.right, leftRight, true, false)
+		input:addHookReleased(self.controls.up, upDown, false, false)
+		input:addHookReleased(self.controls.down, upDown, true, false)
 
-		input:addHookPressed("lshift", setShift, true)
-		input:addHookReleased("lshift", setShift, false)
+		input:addHookPressed(self.controls.sprint, setShift, true)
+		input:addHookReleased(self.controls.sprint, setShift, false)
+
+		input:addHookPressed(self.controls.a, setButtons, true, true)
+		input:addHookReleased(self.controls.a, setButtons, true, false)
+
+		input:addHookPressed(self.controls.b, setButtons, false, true)
+		input:addHookReleased(self.controls.b, setButtons, false, false)
 	end
 
 	registerControls()
