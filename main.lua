@@ -28,8 +28,8 @@ local window =      love.window
 	other:
 		- make level editor
 		- work on UI: dialog, inventory, party
-		- work on encounter mechanics
 		- sfx, music support
+		- work on encounter mechanics
 --]]
 
 -- constants
@@ -132,13 +132,6 @@ local function printDebugInfo()
 		character_1.y}, 10, 100)
 
 	graphics.print({whiteTextColor,
-		"LoadTime: ",
-		greenTextColor,
-		tostring(loadTime):sub(0,5),
-		whiteTextColor,
-		" seconds"}, 10, 115)
-
-	graphics.print({whiteTextColor,
 		"DiagonalInfo: ",
 		cyanTextColor,
 		tostring(character_1.player.diagonal),
@@ -147,7 +140,14 @@ local function printDebugInfo()
 		tostring(character_1.player.direction),
 		whiteTextColor, ", ",
 		cyanTextColor,
-		character_1.player.ambiguity}, 10, 130)
+		character_1.player.ambiguity}, 10, 115)
+
+	graphics.print({whiteTextColor,
+		"LoadTime: ",
+		greenTextColor,
+		tostring(loadTime):sub(0,5),
+		whiteTextColor,
+		" seconds"}, 10, windowHeight - 35)
 
 	graphics.print({whiteTextColor,
 		"Version: ",
@@ -214,6 +214,7 @@ local _debug_switchedRooms = false
 
 function _debug_switchRooms()
 	if not _debug_switchedRooms then
+		graphics.setColor(1, 1, 1, 1)
 		local _tile = tilemap.new(tileset_1, 5, 5, tileset_1.tiles.gradient)
 		local _collision = collisionmap.new(_tile.x, _tile.y, true)
 		local _room = room.new(_tile, _collision, nil, 0, 2, true)
