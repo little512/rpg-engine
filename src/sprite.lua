@@ -23,10 +23,14 @@ end
 
 function sprite:createQuad(name, x, y, sx, sy)
 	self.quads[name] = graphics.newQuad((x * self.scaleX), (y * self.scaleY), sx, sy, self.image:getDimensions())
+
+	return self
 end
 
 function sprite:createRawQuad(name, x, y, sx, sy) -- for when you have a complicated sprite sheet to chop up
 	self.quads[name] = graphics.newQuad(x, y, sx, sy, self.image:getDimensions())
+
+	return self
 end
 
 function sprite:getQuad(name)
@@ -35,6 +39,8 @@ end
 
 function sprite:setQuad(name)
 	self.currentQuad = self.quads[name]
+
+	return self
 end
 
 function sprite:draw(precise)

@@ -35,11 +35,13 @@ end
 function room:addSprite(name, sprite)
 	self.spritelist[name] = sprite
 
-	self:drawSpriteCanvas(true)
+	self:makeDirty()
 end
 
 function room:removeSprite(name)
 	self.spritelist[name] = nil
+
+	self:makeDirty()
 end
 
 function room:updateSpriteCanvas(doNotClear)
@@ -76,6 +78,8 @@ end
 
 function room:makeDirty() -- update sprite canvas
 	self.dirty = true
+
+	self:drawSpriteCanvas(true)
 end
 
 function room:drawTilemapCanvas()

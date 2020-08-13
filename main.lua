@@ -239,6 +239,11 @@ function love.load()
 
 	room_1:addSprite("sprite_1", sprite_1)
 
+	room_1:addSprite("sprite2", 
+		sprite.new("data/img/spritesheet_1.png", 32, 32, 3, 0)
+			:createQuad("red", 2, 1, 32, 32)
+			:setQuad("red"))
+
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
 	print("Finished loading in " .. loadTime .. " seconds.")
