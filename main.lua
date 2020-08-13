@@ -237,6 +237,8 @@ function love.load()
 	sprite_1:createQuad("dark_red", 0, 1, sprite_1.scaleX, sprite_1.scaleY)
 	sprite_1:setQuad("dark_red")
 
+	room_1:addSprite("sprite_1", sprite_1)
+
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
 	print("Finished loading in " .. loadTime .. " seconds.")
@@ -267,6 +269,7 @@ input:addHookReleased("e", _debug_switchRooms)
 -- [[ testing for switching rooms ]]
 
 function love.update(dt)
+	-- update movement
 	if (character_1.player.inputting and not character_1.moving) or character_1.moving then
 		local _x, _y = util.absToPixels(character_1.absX,
 			character_1.absY,
@@ -274,6 +277,9 @@ function love.update(dt)
 			tilemap_1.tileset)
 		character_1:move(_x, _y, dt)
 	end
+
+	-- update room clearing
+	character_1.currentRoom:updateSpriteCanvas()
 end
 
 function love.resize(w, h)
@@ -310,13 +316,11 @@ function love.draw()
 		-- draw background image
 
 		-- draw tiles
-		graphics.draw(character_1.currentRoom.canvas)
+		character_1.currentRoom:drawTilemapCanvas()
 
 		-- draw sprites
-		-- TODO: make a better way to do this, such as a list of sprites to render per room.
-		-- TODO: figure out the cause of sprite drifting with non-integer scale values for rooms.
-
-		sprite_1:draw() 
+		-- NOTE: fixed sprite drifting by drawing sprites to a canvas
+		character_1.currentRoom:drawSpriteCanvas()
 
 		-- draw character
 		graphics.draw(character_1.character, character_1.x, character_1.y)
