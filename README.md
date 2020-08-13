@@ -18,6 +18,8 @@ You can do that too! If you have any questions see the [LICENSE](../master/LICEN
 
 Absolutely! Any changes or features you'd like to add I'm more than happy to review and consider merging with the main branch.
 
+If you're not sure where to start, check out the [Todo list](https://github.com/users/little512/projects/1) or the [open issues](../issues).
+
 ## When will it be finished?
 
 I have no idea. I'm going to keep working on it until I feel it's satisfactory enough for a full game to be made with it.
