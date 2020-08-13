@@ -284,8 +284,9 @@ end
 function love.draw()
 	graphics.setColor(1, 1, 1, 1)
 
-	graphics.push() -- TODO: add support for scaling
+	graphics.push()
 		local _scale = character_1.currentRoom.scale
+
 		-- scale
 		graphics.scale(_scale or 1)
 
@@ -313,8 +314,9 @@ function love.draw()
 
 		-- draw sprites
 		-- TODO: make a better way to do this, such as a list of sprites to render per room.
+		-- TODO: figure out the cause of sprite drifting with non-integer scale values for rooms.
 
-		sprite_1:draw() -- TODO: figure out the cause of sprite drifting (I suspect it has to do with subpixel values during camera lerping)
+		sprite_1:draw() 
 
 		-- draw character
 		graphics.draw(character_1.character, character_1.x, character_1.y)
