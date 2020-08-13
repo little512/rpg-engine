@@ -17,7 +17,7 @@ local touch =       love.touch
 local video =       love.video
 local window =      love.window
 
---[[ TODO: 
+--[[ TODO: (see: https://github.com/users/little512/projects/1)
 		X add tile sheets and tile maps
 		X add playable character
 		X add collision map (impassable, passable, etc)
