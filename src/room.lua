@@ -44,15 +44,11 @@ end
 
 function room:updateSpriteCanvas(doNotClear)
 	if self.dirty then
-		local _clear = true
-
-		if not self.spriteCanvas then
-			_clear = false
+		if self.spriteCanvas and not doNotClear then
+			self.spriteCanvas:renderTo(function()
+				graphics.clear()
+			end)
 		end
-
-		self.spriteCanvas:renderTo(function()
-			graphics.clear()
-		end)
 	end
 end
 

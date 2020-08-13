@@ -42,17 +42,13 @@ function tilemap:getCanvas(oldCanvas)
 	end
 
 	if oldCanvas then
-		oldCanvas:renderTo(function() -- TODO: manage clearing with love.update
-			_draw()
-		end)
+		oldCanvas:renderTo(_draw) -- TODO: manage clearing with love.update
 
 		return oldCanvas
 	else
 		local _canvas = graphics.newCanvas(self.x * self.tileset.scale, self.y * self.tileset.scale) -- create canvas for our tiles
 
-		graphics.setCanvas(_canvas)
-			_draw() -- draw tiles to the canvas
-		graphics.setCanvas()
+		_canvas:renderTo(_draw)
 
 		return _canvas
 	end
