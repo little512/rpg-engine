@@ -33,13 +33,13 @@ local window =      love.window
 --]]
 
 -- constants
-local config = require("src.config")
-local whiteTextColor = {1, 1, 1, 1}
-local redTextColor = {1, (20 / 255), (20 / 255), 1}
-local greenTextColor = {0, 1, (20 / 255), 1}
-local blueTextColor = {(100 / 255), (100 / 255), (230 / 255), 1}
-local cyanTextColor = {0, 1, 1, 1}
-local collectionMode = "count"
+local config 			= require("src.config")
+local whiteTextColor 	= {1, 1, 1, 1}
+local redTextColor 		= {1, (20 / 255), (20 / 255), 1}
+local greenTextColor 	= {0, 1, (20 / 255), 1}
+local blueTextColor 	= {(100 / 255), (100 / 255), (230 / 255), 1}
+local cyanTextColor 	= {0, 1, 1, 1}
+local collectionMode 	= "count"
 
 -- variables
 local showDebugInfo = false
@@ -216,7 +216,7 @@ function love.load()
 
 	eventmap_1:setEvent("event_1", 2, 2)
 
-	room_1 = room.new(tilemap_1, collisionmap_1, eventmap_1, 0, 0, false)
+	room_1 = room.new(tilemap_1, collisionmap_1, eventmap_1, 0, 0, 1.5, true)
 
 	player_1 = player.new()
 
@@ -243,7 +243,7 @@ function _debug_switchRooms()
 		graphics.setColor(1, 1, 1, 1)
 		local _tile = tilemap.new(tileset_1, 5, 5, tileset_1.tiles.gradient)
 		local _collision = collisionmap.new(_tile.x, _tile.y, true)
-		local _room = room.new(_tile, _collision, nil, 0, 2, true)
+		local _room = room.new(_tile, _collision, nil, 0, 2, 1.5, false)
 
 		character_1:setRoom(_room)
 
@@ -276,20 +276,23 @@ end
 function love.draw()
 	graphics.setColor(1, 1, 1, 1)
 
-	graphics.push()
+	graphics.push() -- TODO: add support for scaling
+		local _scale = character_1.currentRoom.scale
+		-- scale
+		graphics.scale(_scale or 1)
 
 		-- translate
 		if character_1.currentRoom.cameraMode then
-			graphics.translate(-character_1.x + (windowWidth / 2) -
-					characterImageX / (tilemap_1.tileset.scale / characterImageX), 
-				-character_1.y + (windowHeight / 2) -
-					characterImageY / (tilemap_1.tileset.scale / characterImageY))
+			graphics.translate((-character_1.x + ((windowWidth / _scale) / 2) -
+					characterImageX / (tilemap_1.tileset.scale / characterImageX)),
+				(-character_1.y + ((windowHeight / _scale) / 2) -
+					characterImageY / (tilemap_1.tileset.scale / characterImageY)) )
 		else
-			graphics.translate((windowWidth / 2) -
+			graphics.translate(((windowWidth / _scale) / 2) -
 				((character_1.currentRoom.maps.tile.x *
 					character_1.currentRoom.maps.tile.tileset.scale) / 2) +
 						character_1.currentRoom.stationaryX,
-				(windowHeight / 2) -
+				((windowHeight / _scale) / 2) -
 					((character_1.currentRoom.maps.tile.y *
 						character_1.currentRoom.maps.tile.tileset.scale) / 2) +
 							character_1.currentRoom.stationaryY)

@@ -2,7 +2,7 @@
 
 local room = {}
 
-function room.new(_tile, _collision, _event, _startX, _startY, _cameraMode, _stationaryX, _stationaryY) -- TODO: create eventmap class
+function room.new(_tile, _collision, _event, _startX, _startY, _scale, _cameraMode, _stationaryX, _stationaryY) -- TODO: create eventmap class
 	return setmetatable({
 		maps = {
 			tile = _tile;
@@ -13,6 +13,8 @@ function room.new(_tile, _collision, _event, _startX, _startY, _cameraMode, _sta
 		startY = _startY or 0;
 
 		canvas = _tile:getCanvas();
+
+		scale = _scale;
 
 		cameraMode = _cameraMode; -- true = follow, false = stationary
 		stationaryX = _stationaryX or 0; -- offset from center
