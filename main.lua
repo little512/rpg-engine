@@ -23,9 +23,11 @@ local window =      love.window
 		X add collision map (impassable, passable, etc)
 		X add rooms (stationary cam, follow cam, doors)
 		X add event tiles (button [standing], interactable [adjacent actionable])
-		- add sprites
+		X add sprites
 
 	other:
+		- make actor class which gets assigned a sprite and defines sprite changing
+		behavior (probably gets passed deltatime or current frame count)
 		- make level editor
 		- work on UI: dialog, inventory, party
 		- sfx, music support
@@ -53,6 +55,7 @@ local character 	= require("src.character")
 local collisionmap 	= require("src.collisionmap")
 local room 			= require("src.room")
 local eventmap		= require("src.eventmap")
+local sprite		= require("src.sprite")
 
 -- class singletons
 local input = require("src.input")
@@ -70,6 +73,7 @@ local collisionmap_1
 local canvas_1
 local room_1
 local eventmap_1
+local sprite_1
 
 local player_1
 local character_1
@@ -229,6 +233,10 @@ function love.load()
 
 	input:addHookReleased("f1", toggleDebugInfo) -- wait for the info to be loaded
 
+	sprite_1 = sprite.new("data/img/spritesheet_1.png", 32, 32, 2, 0)
+	sprite_1:createQuad("dark_red", 0, 1, sprite_1.scaleX, sprite_1.scaleY)
+	sprite_1:setQuad("dark_red")
+
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
 	print("Finished loading in " .. loadTime .. " seconds.")
@@ -302,6 +310,11 @@ function love.draw()
 
 		-- draw tiles
 		graphics.draw(character_1.currentRoom.canvas)
+
+		-- draw sprites
+		-- TODO: make a better way to do this, such as a list of sprites to render per room.
+
+		sprite_1:draw() -- TODO: figure out the cause of sprite drifting (I suspect it has to do with subpixel values during camera lerping)
 
 		-- draw character
 		graphics.draw(character_1.character, character_1.x, character_1.y)
