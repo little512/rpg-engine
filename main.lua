@@ -286,6 +286,8 @@ function _debug_switchRooms()
 		local _collision = collisionmap.new(_tile.x, _tile.y, false)
 		local _room = room.new(_tile, _collision, nil, 0, 2, 1.5, false)
 
+		_room:drawTilemapCanvas(true)
+
 		character_1:setRoom(_room)
 
 		_debug_switchedRooms = true
