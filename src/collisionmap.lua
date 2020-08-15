@@ -40,7 +40,7 @@ function collisionmap:getCollisionState(x, y)
 			return collisionmap.states.NONPASSABLE
 		end
 	else
-		return self.map[y + 1][x + 1]
+		return (self.map[y + 1] or {})[x + 1] -- hack to prevent indexing nil when OOB is passable
 	end
 end
 

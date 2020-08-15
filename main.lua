@@ -257,7 +257,7 @@ function _debug_switchRooms()
 	if not _debug_switchedRooms then
 		graphics.setColor(1, 1, 1, 1)
 		local _tile = tilemap.new(tileset_1, 5, 5, tileset_1.tiles.gradient)
-		local _collision = collisionmap.new(_tile.x, _tile.y, true)
+		local _collision = collisionmap.new(_tile.x, _tile.y, false)
 		local _room = room.new(_tile, _collision, nil, 0, 2, 1.5, false)
 
 		character_1:setRoom(_room)
