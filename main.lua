@@ -223,6 +223,7 @@ function love.load()
 	eventmap_1:setEvent("event_1", 2, 2)
 
 	room_1 = room.new(tilemap_1, collisionmap_1, eventmap_1, 0, 0, 1.5, true)
+	room_1:drawTilemapCanvas(true) -- tilemap must be updated once before it will show up (i have no idea why)
 
 	player_1 = player.new()
 
@@ -312,12 +313,24 @@ function love.update(dt)
 	-- update room clearing
 	character_1.currentRoom:updateSpriteCanvas()
 
-	if fc % 10 == 0 then
+	-- update tilemap clearing
+	character_1.currentRoom:updateTilemapCanvas()
+
+	if fc % 30 == 0 then
 		for i, v in pairs(character_1.currentRoom.spritelist) do
 			v:setQuad(math.random(0,2) .. math.random(0,1))
 		end
 
-		character_1.currentRoom:makeDirty()
+		local randomTile = math.random(1,3)
+
+		tilemap_1:setTile(
+			(randomTile == 1 and tileset_1.tiles["white"]) or
+			(randomTile == 2 and tileset_1.tiles["black"]) or
+			(randomTile == 3 and tileset_1.tiles["gradient"]), 7, 0
+		)
+
+		character_1.currentRoom:makeSpriteCanvasDirty()
+		character_1.currentRoom:makeTilemapCanvasDirty()
 	end
 end
 

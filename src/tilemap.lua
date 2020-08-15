@@ -32,26 +32,4 @@ function tilemap:getTile(x, y)
 	return self.map[y + 1][x + 1]
 end
 
-function tilemap:getCanvas(oldCanvas)
-	local function _draw()
-		for y, row in ipairs(self.map) do
-			for x, tile in ipairs(row) do
-				graphics.draw(self.tileset.image, tile, (x - 1) * self.tileset.scale, (y - 1) * self.tileset.scale)
-			end
-		end
-	end
-
-	if oldCanvas then
-		oldCanvas:renderTo(_draw) -- TODO: manage clearing with love.update
-
-		return oldCanvas
-	else
-		local _canvas = graphics.newCanvas(self.x * self.tileset.scale, self.y * self.tileset.scale) -- create canvas for our tiles
-
-		_canvas:renderTo(_draw)
-
-		return _canvas
-	end
-end
-
 return tilemap
