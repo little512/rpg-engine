@@ -241,21 +241,33 @@ function love.load()
 
 	--room_1:addSprite("sprite_1", sprite_1)
 
+	local sprite1, sprite2
+
 	room_1:addSprite("sprite2", (function()
-		return sprite.new(
+		sprite1 = sprite.new(
 			"data/img/spritesheet_1.png", 32, 32, 5, 0)
-				:createQuad("multicolor", 0, 0, 32, 32)
-				:setQuad("multicolor")
+				:createQuad("color", 0, 0, 32, 32)
+				:setQuad("color")
+
+		return sprite1
 	end)())
 
 	room_1:addSprite("sprite3", (function()
-		local s = sprite.new(
+		sprite2 = sprite.new(
 			"data/img/spritesheet_1.png", 32, 32, 6 * 32, 0)
-				:createQuad("multicolor_red", 0, 1, 32, 32)
-				:setQuad("multicolor_red")
-		s.precise = true
-		return s
+				:createQuad("color", 0, 0, 32, 32)
+				:setQuad("color")
+		sprite2.precise = true
+		return sprite2
 	end)())
+
+	for x = 0, 2 do
+		for y = 0, 1 do
+			sprite1:createQuad(x .. y, x, y, 32, 32)
+			sprite2:createQuad(x .. y, x, y, 32, 32)
+		end
+	end
+	
 
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
@@ -302,9 +314,10 @@ function love.update(dt)
 
 	if fc % 10 == 0 then
 		for i, v in pairs(character_1.currentRoom.spritelist) do
-			v:createQuad("r", math.random(0,2), math.random(0,1), 32, 32):setQuad("r")
-			character_1.currentRoom:makeDirty()
+			v:setQuad(math.random(0,2) .. math.random(0,1))
 		end
+
+		character_1.currentRoom:makeDirty()
 	end
 end
 
