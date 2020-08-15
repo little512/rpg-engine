@@ -58,7 +58,7 @@ function room:drawSpriteCanvas(update)
 	if self.dirty then
 		local function _draw()
 			for _, s in pairs(self.spritelist) do
-				s:draw()
+				s:draw(s.precise)
 			end
 		end
 	

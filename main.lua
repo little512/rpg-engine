@@ -73,7 +73,7 @@ local collisionmap_1
 local canvas_1
 local room_1
 local eventmap_1
-local sprite_1
+--local sprite_1
 
 local player_1
 local character_1
@@ -233,16 +233,20 @@ function love.load()
 
 	input:addHookReleased("f1", toggleDebugInfo) -- wait for the info to be loaded
 
-	sprite_1 = sprite.new("data/img/spritesheet_1.png", 32, 32, 2, 0)
-	sprite_1:createQuad("dark_red", 0, 1, sprite_1.scaleX, sprite_1.scaleY)
-	sprite_1:setQuad("dark_red")
+	--sprite_1 = sprite.new("data/img/spritesheet_1.png", 32, 32, 2, 0)
+	--sprite_1:createQuad("dark_red", 0, 1, sprite_1.scaleX, sprite_1.scaleY)
+	--sprite_1:setQuad("dark_red")
 
-	room_1:addSprite("sprite_1", sprite_1)
+	--room_1:addSprite("sprite_1", sprite_1)
 
-	room_1:addSprite("sprite2", 
-		sprite.new("data/img/spritesheet_1.png", 32, 32, 3, 0)
-			:createQuad("red", 2, 1, 32, 32)
-			:setQuad("red"))
+	room_1:addSprite("sprite2", (function()
+		local sprite = sprite.new(
+			"data/img/spritesheet_1.png", 64, 64, 64, 0)
+				:createQuad("red", 0, 0, 64, 64)
+				:setQuad("red")
+		sprite.precise = true
+		return sprite
+	end)())
 
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
