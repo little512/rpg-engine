@@ -17,6 +17,8 @@ local touch =       love.touch
 local video =       love.video
 local window =      love.window
 
+math.randomseed(os.time())
+
 --[[ TODO: (see: https://github.com/users/little512/projects/1)
 		X add tile sheets and tile maps
 		X add playable character
@@ -242,14 +244,14 @@ function love.load()
 	room_1:addSprite("sprite2", (function()
 		return sprite.new(
 			"data/img/spritesheet_1.png", 32, 32, 5, 0)
-				:createQuad("multicolor", 0, 0, 64, 32)
+				:createQuad("multicolor", 0, 0, 32, 32)
 				:setQuad("multicolor")
 	end)())
 
 	room_1:addSprite("sprite3", (function()
 		local s = sprite.new(
-			"data/img/spritesheet_1.png", 32, 32, 7 * 32, 0)
-				:createQuad("multicolor_red", 0, 1, 64, 32)
+			"data/img/spritesheet_1.png", 32, 32, 6 * 32, 0)
+				:createQuad("multicolor_red", 0, 1, 32, 32)
 				:setQuad("multicolor_red")
 		s.precise = true
 		return s
@@ -283,8 +285,9 @@ end
 input:addHookReleased("e", _debug_switchRooms)
 
 -- [[ testing for switching rooms ]]
-
+local fc = 0
 function love.update(dt)
+	fc = fc + 1
 	-- update movement
 	if (character_1.player.inputting and not character_1.moving) or character_1.moving then
 		local _x, _y = util.absToPixels(character_1.absX,
@@ -296,6 +299,13 @@ function love.update(dt)
 
 	-- update room clearing
 	character_1.currentRoom:updateSpriteCanvas()
+
+	if fc % 10 == 0 then
+		for i, v in pairs(character_1.currentRoom.spritelist) do
+			v:createQuad("r", math.random(0,2), math.random(0,1), 32, 32):setQuad("r")
+			character_1.currentRoom:makeDirty()
+		end
+	end
 end
 
 function love.resize(w, h)
