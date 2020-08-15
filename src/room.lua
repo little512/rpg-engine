@@ -87,7 +87,6 @@ end
 
 function room:drawTilemapCanvas(update)
 	if self.dirt.tilemap then
-		print("update tilemap")
 		local function _draw()
 			for y, row in ipairs(self.maps.tile.map) do
 				for x, tile in ipairs(row) do
@@ -97,7 +96,6 @@ function room:drawTilemapCanvas(update)
 		end
 
 		if not self.canvases.tilemap then 
-			print("new tilemap")
 			self.canvases.tilemap = graphics.newCanvas(self._tilemapX, self._tilemapY)
 		end
 
