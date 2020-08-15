@@ -240,12 +240,19 @@ function love.load()
 	--room_1:addSprite("sprite_1", sprite_1)
 
 	room_1:addSprite("sprite2", (function()
-		local sprite = sprite.new(
-			"data/img/spritesheet_1.png", 64, 64, 64, 0)
-				:createQuad("red", 0, 0, 64, 64)
-				:setQuad("red")
-		sprite.precise = true
-		return sprite
+		return sprite.new(
+			"data/img/spritesheet_1.png", 32, 32, 5, 0)
+				:createQuad("multicolor", 0, 0, 64, 32)
+				:setQuad("multicolor")
+	end)())
+
+	room_1:addSprite("sprite3", (function()
+		local s = sprite.new(
+			"data/img/spritesheet_1.png", 32, 32, 7 * 32, 0)
+				:createQuad("multicolor_red", 0, 1, 64, 32)
+				:setQuad("multicolor_red")
+		s.precise = true
+		return s
 	end)())
 
 	endTime = timer.getTime()
