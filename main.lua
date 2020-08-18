@@ -58,6 +58,8 @@ local collisionmap 	= require("src.collisionmap")
 local room 			= require("src.room")
 local eventmap		= require("src.eventmap")
 local sprite		= require("src.sprite")
+local actor			= require("src.actor")
+local actordata		= require("src.actordata")
 
 -- class singletons
 local input = require("src.input")
@@ -268,7 +270,23 @@ function love.load()
 			sprite2:createQuad(x .. y, x, y, 32, 32)
 		end
 	end
-	
+
+	actor_1 = (function() 
+		local a = actor.new((function()
+			local s = sprite.new(
+				"data/img/spritesheet_1.png", 32, 32, 8, 0)
+					:createQuad("00", 0, 0, 32, 32)
+					:createQuad("10", 1, 0, 32, 32)
+					:createQuad("20", 2, 0, 32, 32)
+					:setQuad("00")
+
+			return s
+		end)(),
+		actordata.new("frames", 30, "actor_1"):pushQuad("00"):pushQuad("10"):pushQuad("20"),
+		room_1)
+
+		return a
+	end)()
 
 	endTime = timer.getTime()
 	loadTime = endTime - startTime
@@ -318,9 +336,14 @@ function love.update(dt)
 	-- update tilemap clearing
 	character_1.currentRoom:updateTilemapCanvas()
 
+	-- update actors
+	character_1.currentRoom:updateActors(dt, fc)
+
 	if fc % 30 == 0 then
-		for i, v in pairs(character_1.currentRoom.spritelist) do
-			v:setQuad(math.random(0,2) .. math.random(0,1))
+		for i, v in pairs(character_1.currentRoom.lists.sprite) do
+			if i ~= "actor_1" then
+				v:setQuad(math.random(0,2) .. math.random(0,1))
+			end
 		end
 
 		local randomTile = math.random(1,3)

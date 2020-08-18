@@ -23,7 +23,10 @@ function room.new(_tile, _collision, _event, _startX, _startY, _scale, _cameraMo
 
 		scale = _scale;
 
-		spritelist = {}; -- TODO: change this when actor class is implemented
+		lists = {
+			sprite = {};
+			actor = {};
+		};
 
 		cameraMode = _cameraMode; -- true = follow, false = stationary
 		stationaryX = _stationaryX or 0; -- offset from center
@@ -36,15 +39,25 @@ function room.new(_tile, _collision, _event, _startX, _startY, _scale, _cameraMo
 end
 
 function room:addSprite(name, sprite)
-	self.spritelist[name] = sprite
+	self.lists.sprite[name] = sprite
 
 	self:makeSpriteCanvasDirty()
 end
 
 function room:removeSprite(name)
-	self.spritelist[name] = nil
+	self.lists.sprite[name] = nil
 
 	self:makeSpriteCanvasDirty()
+end
+
+function room:addActor(name, _actor)
+	self.lists.actor[name] = _actor
+
+	_actor.room = self
+end
+
+function room:removeActor(name)
+	self.lists.actor[name] = nil
 end
 
 function room:updateSpriteCanvas(doNotClear)
@@ -60,7 +73,7 @@ end
 function room:drawSpriteCanvas(update)
 	if self.dirt.sprite then
 		local function _draw()
-			for _, s in pairs(self.spritelist) do
+			for _, s in pairs(self.lists.sprite) do
 				s:draw(s.precise)
 			end
 		end
@@ -111,7 +124,6 @@ end
 
 function room:updateTilemapCanvas()
 	if self.dirt.tilemap and self.canvases.tilemap then
-		print("clear tilemap")
 		self.canvases.tilemap:renderTo(function() graphics.clear() end)
 	end
 end
@@ -120,6 +132,12 @@ function room:makeTilemapCanvasDirty()
 	self.dirt.tilemap = true
 
 	self:drawTilemapCanvas(true)
+end
+
+function room:updateActors(dt, fc)
+	for _, actor in pairs(self.lists.actor) do
+		actor:update(dt, fc)
+	end
 end
 
 return room

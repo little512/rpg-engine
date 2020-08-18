@@ -257,6 +257,12 @@ function character:move(mx, my, dt)
 end
 
 function character:handleInputs(b, p)
+	--[[
+		b = true: A
+		b = false: B
+		p = true: pressing
+		p = false: releasing
+	]]
 	if b and p then -- pressing A
 		self:eventDetection(true)
 	end
