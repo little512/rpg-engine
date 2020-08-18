@@ -38,9 +38,10 @@ function sprite:getQuad(name)
 end
 
 function sprite:setQuad(name)
-	if type(name) == "string" then
+	local t = type(name)
+	if t == "string" then
 		self.currentQuad = self.quads[name]
-	elseif type(name) == "Quad" then
+	elseif t == "userdata" then
 		self.currentQuad = name -- not actually name
 	end
 
