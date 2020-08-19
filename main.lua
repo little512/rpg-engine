@@ -224,7 +224,7 @@ function love.load()
 
 	eventmap_1:setEvent("event_1", 2, 2)
 
-	room_1 = room.new(tilemap_1, collisionmap_1, eventmap_1, 0, 0, 1.5, true)
+	room_1 = room.new(tilemap_1, collisionmap_1, eventmap_1, 0, 0, 2, true)
 	room_1:drawTilemapCanvas(true) -- tilemap must be updated once before it will show up (i have no idea why)
 
 	player_1 = player.new()
