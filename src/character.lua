@@ -1,7 +1,5 @@
 -- plug in player inputs to manage character movement
 
-local timer = love.timer
-
 local collisionmap = require("src.collisionmap")
 local util = require("src.util")
 local eventmap = require("src.eventmap")
@@ -27,7 +25,7 @@ function character.new(_player, _character, _room) -- can construct character wi
 		absY = 0;
 
 		facingUpDown = -1;
-		facingLeftRight; 0;
+		facingLeftRight = 0;
 
 		elap = 0; 	-- elapsed time
 
@@ -174,7 +172,7 @@ function character:move(mx, my, dt)
 			self.running = false
 		end
 
-		rulesPassed = false
+		local rulesPassed = false
 
 		local function _collision()
 			--print("calculating collision")
