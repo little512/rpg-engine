@@ -371,7 +371,7 @@ function love.draw()
 		local _scale = character_1.currentRoom.scale
 
 		-- scale
-		graphics.scale(_scale or 1)
+		graphics.scale(_scale)
 
 		-- translate
 		if character_1.currentRoom.cameraMode then
