@@ -21,7 +21,7 @@ function room.new(_tile, _collision, _event, _startX, _startY, _scale, _cameraMo
 			sprite = true;
 		};
 
-		scale = _scale;
+		scale = _scale or 1;
 
 		lists = {
 			sprite = {};
